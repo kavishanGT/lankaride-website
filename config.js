@@ -4,7 +4,7 @@
  * Replace these with the business's actual vehicle-specific prices before launch.
  */
 window.LANKARIDE_CONFIG = {
-  businessName: "LankaRide",
+  businessName: "LKRide",
   whatsappNumber: "94760900262",
   currency: "LKR",
   vehicles: [
