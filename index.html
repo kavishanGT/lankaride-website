@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book private taxis, airport transfers and tours across Sri Lanka with LankaRide.">
+  <title>LankaRide — Explore Sri Lanka</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    :root {
+      --green: #163d32;
+      --green2: #245b49;
+      --gold: #e9bd72;
+      --cream: #faf8f2;
+      --ink: #18241f;
+      --muted: #68766f;
+      --line: #e6e9e4;
+      --white: #fff;
+      --radius: 20px;
+      --shadow: 0 18px 50px rgba(20, 48, 38, .10)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #fff;
+      line-height: 1.55
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit
+    }
+
+    .container {
+      width: min(1160px, calc(100% - 40px));
+      margin: auto
+    }
+
+    .nav {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.28rem;
+      font-weight: 850;
+      letter-spacing: -.04em;
+      color: var(--green)
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      background: var(--gold);
+      color: var(--green)
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: #4d5b54;
+      font-size: .94rem
+    }
+
+    .btn {
+      border: 0;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 19px;
+      border-radius: 12px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .18s, background .18s
+    }
+
+    .btn:hover {
+      transform: translateY(-1px)
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--green)
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff
+    }
+
+    .btn-outline {
+      border: 1px solid rgba(255, 255, 255, .5);
+      color: #fff;
+      background: transparent
+    }
+
+    .mobile-menu {
+      display: none
+    }
+
+    .hero {
+      background: var(--green);
+      color: #fff;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.03fr .97fr;
+      gap: 48px;
+      align-items: center;
+      padding: 62px 0 86px
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold);
+      font-weight: 800;
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase
+    }
+
+    .eyebrow:before {
+      content: "";
+      height: 2px;
+      width: 24px;
+      background: var(--gold)
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5.4vw, 4.8rem);
+      line-height: 1.03;
+      letter-spacing: -.06em;
+      margin: 18px 0
+    }
+
+    .hero-copy {
+      color: #d6e2db;
+      font-size: 1.1rem;
+      max-width: 510px
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px
+    }
+
+    .trust {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+      color: #d6e2db;
+      font-size: .86rem
+    }
+
+    .trust span:before {
+      content: "✓";
+      color: var(--gold);
+      font-weight: 900;
+      margin-right: 7px
+    }
+
+    .hero-photo {
+      height: 440px;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      background: #426d56
+    }
+
+    .hero-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .photo-label {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      right: 18px;
+      padding: 17px 18px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .94);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: var(--shadow)
+    }
+
+    .photo-label strong {
+      display: block
+    }
+
+    .photo-label small {
+      color: var(--muted)
+    }
+
+    .round-icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #f6e8cb;
+      color: var(--green);
+      font-size: 1.2rem;
+      flex-shrink: 0
+    }
+
+    .booking-wrap {
+      position: relative;
+      margin-top: -42px;
+      z-index: 2
+    }
+
+    .booking-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 25px
+    }
+
+    .booking-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px
+    }
+
+    .booking-heading h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -.03em
+    }
+
+    .booking-heading p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: .9rem
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1.15fr 1.15fr .85fr .7fr auto;
+      gap: 12px;
+      align-items: end
+    }
+
+    .field label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 800;
+      color: #4b5a52
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid #dfe5df;
+      border-radius: 10px;
+      padding: 12px 11px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      min-width: 0
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--green2);
+      box-shadow: 0 0 0 3px rgba(36, 91, 73, .1)
+    }
+
+    .field input::placeholder {
+      color: #9aa49e
+    }
+
+    .booking-note {
+      color: var(--muted);
+      font-size: .78rem;
+      margin: 13px 0 0
+    }
+
+    .section {
+      padding: 86px 0
+    }
+
+    .section-soft {
+      background: var(--cream)
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 22px;
+      margin-bottom: 30px
+    }
+
+    .kicker {
+      color: var(--green2);
+      font-size: .76rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      font-weight: 850
+    }
+
+    .section h2 {
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      line-height: 1.1;
+      letter-spacing: -.05em;
+      margin: 8px 0 10px
+    }
+
+    .section-head p {
+      max-width: 520px;
+      color: var(--muted);
+      margin: 0
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px
+    }
+
+    .service-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 25px;
+      background: #fff;
+      transition: transform .2s, box-shadow .2s
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow)
+    }
+
+    .service-icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: #eaf1eb;
+      color: var(--green);
+      font-size: 1.4rem
+    }
+
+    .service-card h3 {
+      margin: 18px 0 7px;
+      font-size: 1.13rem
+    }
+
+    .service-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem
+    }
+
+    .text-link {
+      display: inline-block;
+      color: var(--green2);
+      font-weight: 800;
+      margin-top: 17px;
+      font-size: .9rem
+    }
+
+    .destination-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px
+    }
+
+    .destination {
+      height: 290px;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      background: #d5e0d4;
+      color: #fff
+    }
+
+    .destination img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s
+    }
+
+    .destination:hover img {
+      transform: scale(1.06)
+    }
+
+    .destination:after {
+      content: "";
+      position: absolute;
+      inset: 35% 0 0;
+      background: linear-gradient(transparent, rgba(8, 28, 20, .78))
+    }
+
+    .destination-caption {
+      position: absolute;
+      z-index: 1;
+      bottom: 18px;
+      left: 18px
+    }
+
+    .destination-caption h3 {
+      margin: 0;
+      font-size: 1.25rem
+    }
+
+    .destination-caption p {
+      margin: 4px 0 0;
+      color: #e8eee9;
+      font-size: .84rem
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center
+    }
+
+    .why-photo {
+      height: 430px;
+      border-radius: 24px;
+      overflow: hidden
+    }
+
+    .why-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .benefits {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 25px
+    }
+
+    .benefit {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start
+    }
+
+    .benefit .round-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 1rem
+    }
+
+    .benefit strong {
+      display: block;
+      margin: 1px 0 4px
+    }
+
+    .benefit p {
+      font-size: .88rem;
+      color: var(--muted);
+      margin: 0
+    }
+
+    .cta {
+      background: var(--green);
+      color: #fff;
+      border-radius: 24px;
+      padding: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px
+    }
+
+    .cta h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3vw, 2.6rem)
+    }
+
+    .cta p {
+      margin: 0;
+      color: #d6e2db;
+      max-width: 600px
+    }
+
+    .footer {
+      padding: 48px 0 25px;
+      background: #102e26;
+      color: #d6e2db
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 35px
+    }
+
+    .footer .brand {
+      color: #fff
+    }
+
+    .footer p,
+    .footer a {
+      color: #c0d0c7;
+      font-size: .9rem
+    }
+
+    .footer h4 {
+      color: #fff;
+      margin: 4px 0 14px
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 9px
+    }
+
+    .copyright {
+      border-top: 1px solid rgba(255, 255, 255, .13);
+      margin-top: 35px;
+      padding-top: 20px;
+      font-size: .8rem;
+      color: #a8bcb1
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 24, 18, .62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10000
+    }
+
+    .modal-backdrop.open {
+      display: flex
+    }
+
+    .modal {
+      background: #fff;
+      color: var(--ink);
+      width: min(520px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: var(--shadow)
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px
+    }
+
+    .modal-top h2 {
+      margin: 0
+    }
+
+    .close {
+      border: 0;
+      background: #edf1ed;
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .close:hover {
+      background: #dfe6e0
+    }
+
+    .modal .fields {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .modal .wide {
+      grid-column: 1/-1
+    }
+
+    .toast {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff5df;
+      color: #644b1e;
+      font-size: .88rem
+    }
+
+    .toast.show {
+      display: block
+    }
+
+    .fare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px
+    }
+
+    .fare-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 21px
+    }
+
+    .fare-card .route {
+      font-weight: 800;
+      font-size: 1rem
+    }
+
+    .fare-card .estimate {
+      font-size: 1.45rem;
+      font-weight: 850;
+      color: var(--green);
+      letter-spacing: -.04em;
+      margin: 10px 0 4px
+    }
+
+    .fare-card small {
+      color: var(--muted)
+    }
+
+    .fare-card .route-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 14px 0 10px;
+      color: var(--green2);
+      font-size: .84rem;
+      font-weight: 750;
+    }
+
+    .fare-card .route-description {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.6;
+    }
+
+    .fare-card .route-note {
+      display: block;
+      margin-top: 8px;
+      font-size: .76rem;
+      line-height: 1.5;
+    }
+
+    .fare-card button {
+      margin-top: 14px;
+      width: 100%;
+      border: 1px solid #d7e2d8;
+      background: #f2f6f1;
+      color: var(--green);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 750;
+      cursor: pointer
+    }
+
+    .fare-disclaimer {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-top: 18px
+    }
+
+    .footer-links a[href^="https://wa.me"] {
+      color: #fff
+    }
+
+    /* Live Location & Map Picker UI */
+    .field-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px
+    }
+
+    .field-tools {
+      display: flex;
+      gap: 5px
+    }
+
+    .tool-btn {
+      background: #edf4ef;
+      color: var(--green);
+      border: 1px solid #d0dfd4;
+      border-radius: 7px;
+      padding: 3px 8px;
+      font-size: .73rem;
+      font-weight: 750;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all .18s;
+      line-height: 1.2
+    }
+
+    .tool-btn:hover {
+      background: var(--gold);
+      color: var(--green);
+      border-color: var(--gold);
+      transform: translateY(-1px)
+    }
+
+    .tool-btn:disabled {
+      opacity: .6;
+      cursor: wait
+    }
+
+    .map-modal-wrap {
+      width: min(720px, 100%);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: var(--shadow)
+    }
+
+    .map-search-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap
+    }
+
+    .map-search-row input {
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid #dfe5df;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: .9rem;
+      outline: none
+    }
+
+    .map-search-row input:focus {
+      border-color: var(--green2);
+      box-shadow: 0 0 0 3px rgba(36, 91, 73, .1)
+    }
+
+    #interactive-map {
+      width: 100%;
+      height: 370px;
+      border-radius: 14px;
+      margin: 12px 0;
+      border: 1px solid var(--line);
+      z-index: 1
+    }
+
+    .map-footer-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      background: #f6f9f7;
+      border: 1px solid #e1e9e3;
+      border-radius: 12px;
+      flex-wrap: wrap
+    }
+
+    .map-footer-text {
+      flex: 1;
+      min-width: 200px
+    }
+
+    .map-footer-text strong {
+      display: block;
+      font-size: .92rem;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .map-footer-text small {
+      display: block;
+      color: var(--muted);
+      font-size: .75rem
+    }
+
+    .custom-map-pin {
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .35))
+    }
+
+    /* Reference layout: Vehicles & Modern Booking Form */
+    .booking-form-v2 {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .booking-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .loc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .loc-header label {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: #3f4e45;
+    }
+
+    .airport-pill {
+      border: 1px solid #d8e2da;
+      background: #f7faf8;
+      color: var(--green);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s;
+    }
+
+    .airport-pill:hover {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--green);
+      transform: translateY(-1px);
+    }
+
+    .input-with-actions {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .location-suggestions {
+      display: none;
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 0;
+      right: 0;
+      z-index: 5000;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 5px;
+      background: #fff;
+      border: 1px solid #dfe5df;
+      border-radius: 12px;
+      box-shadow: 0 14px 32px rgba(20, 48, 38, .16);
+    }
+
+    .location-suggestions.open {
+      display: block;
+    }
+
+    .location-suggestion {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      text-align: left;
+      font-size: .88rem;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .location-suggestion:hover,
+    .location-suggestion:focus {
+      background: #edf4ef;
+      outline: none;
+    }
+
+    .location-suggestion small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: .75rem;
+    }
+
+    .passenger-name-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      margin-top: 2px;
+    }
+
+    .passenger-name-row input {
+      width: 100%;
+      border: 1.5px solid #dfe5df;
+      border-radius: 14px;
+      padding: 13px 14px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .passenger-name-row input:focus {
+      border-color: var(--green2);
+      box-shadow: 0 0 0 3px rgba(36, 91, 73, .1);
+    }
+
+    .input-icon-left {
+      position: absolute;
+      left: 14px;
+      color: #798b80;
+      font-size: 1.05rem;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .input-with-actions input {
+      width: 100%;
+      border: 1.5px solid #dfe5df;
+      border-radius: 14px;
+      padding: 13px 135px 13px 40px;
+      font-size: 0.94rem;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-with-actions input:focus {
+      border-color: var(--green2);
+      box-shadow: 0 0 0 3px rgba(36, 91, 73, 0.1);
+    }
+
+    .input-actions-right {
+      position: absolute;
+      right: 7px;
+      display: flex;
+      gap: 5px;
+      z-index: 2;
+    }
+
+    .btn-current-loc {
+      background: #fff8e1;
+      color: #8c6708;
+      border: 1px solid #f2db8c;
+      border-radius: 9px;
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 750;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .btn-current-loc:hover {
+      background: #faeab5;
+      transform: translateY(-1px);
+    }
+
+    .btn-map-loc {
+      background: #eef4f0;
+      color: var(--green);
+      border: 1px solid #d4dfd6;
+      border-radius: 9px;
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 750;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .btn-map-loc:hover {
+      background: #dfece3;
+      transform: translateY(-1px);
+    }
+
+    /* Date and Time Group */
+    .time-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-group select {
+      flex: 1;
+      border: 1.5px solid #dfe5df;
+      border-radius: 12px;
+      padding: 13px 10px;
+      background: #fff;
+      outline: none;
+      font-size: 0.92rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .time-separator {
+      font-weight: 800;
+      color: #64736a;
+      font-size: 1.1rem;
+    }
+
+    /* 5 Vehicle Type Cards Grid */
+    .vehicle-section-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #3b4941;
+      margin-bottom: 12px;
+    }
+
+    .vehicle-grid-v2 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .vehicle-card-v2 {
+      background: #fff;
+      border: 2px solid #e7ece8;
+      border-radius: 18px;
+      padding: 16px 10px 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .vehicle-card-v2:hover {
+      transform: translateY(-4px);
+      border-color: #cbd8cf;
+      box-shadow: 0 12px 28px rgba(22, 61, 50, 0.08);
+    }
+
+    .vehicle-card-v2.selected {
+      border-color: #f4ba11;
+      background: #fffdf7;
+      box-shadow: 0 10px 30px rgba(244, 186, 17, 0.25);
+    }
+
+    .vehicle-card-v2.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      background: #f4ba11;
+      color: #163d32;
+      font-weight: 900;
+      font-size: 0.72rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .vehicle-img-wrap {
+      height: 95px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .vehicle-img-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.25s;
+    }
+
+    .vehicle-card-v2:hover .vehicle-img-wrap img {
+      transform: scale(1.06);
+    }
+
+    .vehicle-info-v2 strong {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .vehicle-info-v2 .vehicle-model {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .vehicle-badges {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .v-badge {
+      background: #f0f4f1;
+      color: #43544b;
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.69rem;
+      font-weight: 700;
+    }
+
+    /* Calculate Fare Prominent Button */
+    .btn-calc-fare {
+      background: #f4ba11;
+      color: #14382e;
+      font-size: 1.05rem;
+      font-weight: 850;
+      padding: 16px 20px;
+      border-radius: 14px;
+      border: 0;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 5px 16px rgba(244, 186, 17, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-calc-fare:hover {
+      background: #e5ad08;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(244, 186, 17, 0.45);
+    }
+
+    /* Output Results Area */
+    .booking-results-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .result-box {
+      border: 1.5px dashed #dbe3dc;
+      border-radius: 16px;
+      padding: 20px;
+      background: #fafcfa;
+      transition: all 0.25s;
+    }
+
+    .result-box.active {
+      border-style: solid;
+      border-color: #b8cfbe;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(22, 61, 50, 0.06);
+    }
+
+    .result-box-empty {
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .estimate-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 850;
+      color: var(--green);
+      background: #eaf2ed;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .estimate-val {
+      font-size: 1.6rem;
+      font-weight: 850;
+      color: var(--green);
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .estimate-sub {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 14px;
+    }
+
+    .btn-confirm-wa {
+      width: 100%;
+      background: var(--green);
+      color: #fff;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px;
+      font-weight: 750;
+      font-size: 0.94rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.18s;
+    }
+
+    .btn-confirm-wa:hover {
+      background: var(--green2);
+      transform: translateY(-1px);
+    }
+
+    .preview-line {
+      font-size: 0.86rem;
+      margin-bottom: 8px;
+      color: #3b4b42;
+    }
+
+    .preview-line strong {
+      color: var(--ink);
+    }
+
+    @media(max-width:900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 48px 0 72px
+      }
+
+      .hero-photo {
+        height: 340px
+      }
+
+      .vehicle-grid-v2 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .booking-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .booking-results-area {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:620px) {
+      .vehicle-grid-v2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .input-with-actions input {
+        padding-right: 125px;
+      }
+
+      .fields {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .fields .btn {
+        min-height: 47px
+      }
+
+      .destination-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .fare-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .why-grid {
+        gap: 28px
+      }
+
+      .service-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    @media(max-width:620px) {
+      .container {
+        width: min(100% - 28px, 1160px)
+      }
+
+      .nav {
+        height: 68px
+      }
+
+      .nav-links {
+        display: none
+      }
+
+      .mobile-menu {
+        display: inline-flex
+      }
+
+      .nav .btn {
+        padding: 10px 12px
+      }
+
+      .hero-inner {
+        padding: 38px 0 65px
+      }
+
+      h1 {
+        font-size: 2.75rem
+      }
+
+      .hero-copy {
+        font-size: 1rem
+      }
+
+      .hero-photo {
+        height: 280px
+      }
+
+      .photo-label {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        padding: 12px
+      }
+
+      .booking-wrap {
+        margin-top: -30px
+      }
+
+      .booking-card {
+        padding: 18px
+      }
+
+      .booking-heading {
+        align-items: flex-start
+      }
+
+      .fields {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .fields .field:first-child,
+      .fields .field:nth-child(2) {
+        grid-column: 1/-1
+      }
+
+      .fields>.btn {
+        grid-column: 1/-1
+      }
+
+      .section {
+        padding: 62px 0
+      }
+
+      .section-head {
+        display: block
+      }
+
+      .section-head .btn {
+        margin-top: 16px
+      }
+
+      .service-grid {
+        grid-template-columns: 1fr
+      }
+
+      .fare-grid {
+        grid-template-columns: 1fr
+      }
+
+      .destination-grid {
+        gap: 10px
+      }
+
+      .destination {
+        height: 230px
+      }
+
+      .destination-caption {
+        left: 12px;
+        bottom: 13px
+      }
+
+      .destination-caption h3 {
+        font-size: 1.08rem
+      }
+
+      .why-grid {
+        grid-template-columns: 1fr
+      }
+
+      .why-photo {
+        height: 280px
+      }
+
+      .benefits {
+        gap: 18px
+      }
+
+      .cta {
+        padding: 27px;
+        display: block
+      }
+
+      .cta .btn {
+        margin-top: 20px;
+        width: 100%
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 24px
+      }
+
+      .modal .fields {
+        grid-template-columns: 1fr
+      }
+
+      .modal .wide {
+        grid-column: auto
+      }
+
+      #interactive-map {
+        height: 280px
+      }
+
+      .map-footer-preview {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px
+      }
+
+      .map-footer-preview button {
+        width: 100%
+      }
+    }
+
+    /* LankaRide customer reviews */
+    .reviews-section {
+      background: var(--soft, #f5f7f3);
+    }
+
+    .reviews-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 24px 0;
+      padding: 20px 24px;
+      border: 1px solid var(--line, #e4e9e3);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .reviews-score strong {
+      font-size: 2rem;
+      color: var(--green, #124b3e);
+    }
+
+    .reviews-score span {
+      color: #d99a2b;
+      letter-spacing: 2px;
+      font-size: 1.2rem;
+    }
+
+    .reviews-score p {
+      margin: 4px 0 0;
+      color: var(--muted, #66756e);
+      font-size: .92rem;
+    }
+
+    .review-empty {
+      border: 1px dashed #c9d5cc;
+      border-radius: 18px;
+      padding: 30px;
+      text-align: center;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .review-empty h3 {
+      margin: 0 0 8px;
+      color: var(--green, #124b3e);
+    }
+
+    .review-empty p {
+      margin: 0 auto 18px;
+      max-width: 620px;
+      color: var(--muted, #66756e);
+    }
+
+    .review-form-card {
+      margin-top: 24px;
+      padding: 26px;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid var(--line, #e4e9e3);
+      box-shadow: 0 12px 35px rgba(20, 50, 40, .06);
+    }
+
+    .review-form-card h3 {
+      margin: 0 0 6px;
+    }
+
+    .review-form-card>p {
+      margin: 0 0 20px;
+      color: var(--muted, #66756e);
+    }
+
+    .review-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .review-fields .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .review-fields .wide {
+      grid-column: 1/-1;
+    }
+
+    .review-fields label {
+      font-weight: 600;
+      font-size: .92rem;
+    }
+
+    .review-fields input,
+    .review-fields select,
+    .review-fields textarea {
+      width: 100%;
+      border: 1px solid #dce4dd;
+      border-radius: 10px;
+      padding: 12px 13px;
+      font: inherit;
+      color: var(--text, #20342c);
+      background: #fff;
+    }
+
+    .review-fields textarea {
+      min-height: 115px;
+      resize: vertical;
+    }
+
+    .review-privacy {
+      margin-top: 12px !important;
+      font-size: .83rem;
+    }
+
+
+    .brand {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 190px;
+      height: 64px;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    /* Responsive logo sizing */
+    @media (max-width: 768px) {
+      .brand-logo {
+        width: 145px;
+        height: 52px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-logo {
+        width: 125px;
+        height: 46px;
+      }
+    }
+
+    @media(max-width:640px) {
+      .reviews-summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .review-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .review-fields .wide {
+        grid-column: auto;
+      }
+
+      .review-form-card {
+        padding: 19px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="container nav">
+    <a class="brand" href="#home" aria-label="LankaRide home">
+      <img src="images/LankaRide Sri Lanka Travel Logo.png" alt="LankaRide — Explore Sri Lanka with us"
+        class="brand-logo" />
+    </a>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#services">Services</a>
+      <a href="#destinations">Destinations</a>
+      <a href="#why-us">Why LankaRide</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <a class="btn btn-green" href="#booking">
+      Book a taxi <span aria-hidden="true">↗</span>
+    </a>
+  </header>
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-inner">
+        <div><span class="eyebrow">Your Sri Lanka journey begins here</span>
+          <h1>Explore Sri Lanka.<br>Travel with confidence.</h1>
+          <p class="hero-copy">Discover Sri Lanka at your own pace with private rides, airport transfers and
+            unforgettable day trips.</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="#booking">Plan your ride <span>→</span></a><a
+              class="btn btn-outline" href="#destinations">Explore destinations</a></div>
+          <div class="trust"><span>Easy booking</span><span>Local travel support</span><span>Private journeys</span>
+          </div>
+        </div>
+        <div class="hero-photo"><img src="images/image.jpg"
+            alt="Beautiful green mountain landscape for a scenic journey" />
+          <div class="photo-label">
+            <div><strong>Your ride, your route, your Sri Lanka.</strong><small>Choose your vehicle and see your
+                estimated fare.</small>
+            </div><span class="round-icon">✦</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="container booking-wrap" id="booking">
+      <div class="booking-card">
+        <div class="booking-heading">
+          <div>
+            <h2>Where would you like to go?</h2>
+            <p>Select your live location, pick on the map, or enter your destination.</p>
+          </div><span class="round-icon">⌖</span>
+        </div>
+        <form id="quick-booking" class="booking-form-v2" autocomplete="off">
+
+          <!-- Row 1: Pickup & Destination -->
+          <div class="booking-row">
+            <div class="field">
+              <div class="loc-header">
+                <label for="pickup">Pickup location</label>
+                <div class="field-tools">
+                  <button type="button" class="airport-pill" id="btn-airport-pickup" title="Set to Airport">✈
+                    Airport</button>
+                </div>
+              </div>
+              <div class="input-with-actions">
+                <span class="input-icon-left">📍</span>
+                <input id="pickup" name="pickup" placeholder="Airport, hotel or city" required>
+                <div class="input-actions-right">
+                  <button type="button" class="btn-current-loc" id="btn-live-pickup"
+                    title="Use current GPS live location">📍 Live</button>
+                  <button type="button" class="btn-map-loc" id="btn-map-pickup" title="Pick pickup on map">🗺️
+                    Map</button>
+                </div>
+                <div class="location-suggestions" id="pickup-suggestions" role="listbox"
+                  aria-label="Pickup location suggestions"></div>
+              </div>
+            </div>
+            <div class="field">
+              <div class="loc-header">
+                <label for="destination-input">Destination</label>
+              </div>
+              <div class="input-with-actions">
+                <span class="input-icon-left">📌</span>
+                <input id="destination-input" name="destination" placeholder="Where are you going?" required>
+                <div class="input-actions-right">
+                  <button type="button" class="btn-map-loc" id="btn-map-destination" title="Pick destination on map">🗺️
+                    Map</button>
+                </div>
+                <div class="location-suggestions" id="destination-suggestions" role="listbox"
+                  aria-label="Destination suggestions"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passenger details -->
+          <div class="passenger-name-row field">
+            <label for="passenger-name" style="margin-bottom:7px">Passenger name</label>
+            <input id="passenger-name" name="passenger-name" type="text"
+              placeholder="Enter the main passenger's full name" autocomplete="name" maxlength="100" required>
+          </div>
+
+          <!-- Row 2: Date, Time, Passengers -->
+          <div class="booking-row" style="grid-template-columns: 1fr 1fr 0.7fr;">
+            <div class="field">
+              <label for="date" style="margin-bottom:7px">Travel date</label>
+              <input id="date" name="date" type="date" required>
+            </div>
+            <div class="field">
+              <label style="margin-bottom:7px">Pickup time</label>
+              <div class="time-group">
+                <select id="pickup-hour" name="pickup-hour">
+                  <option value="">HH</option>
+                  <option>01</option>
+                  <option>02</option>
+                  <option>03</option>
+                  <option>04</option>
+                  <option>05</option>
+                  <option>06</option>
+                  <option>07</option>
+                  <option>08</option>
+                  <option>09</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+                <span class="time-separator">:</span>
+                <select id="pickup-minute" name="pickup-minute">
+                  <option value="">MM</option>
+                  <option>00</option>
+                  <option>15</option>
+                  <option>30</option>
+                  <option>45</option>
+                </select>
+                <select id="pickup-ampm" name="pickup-ampm">
+                  <option>AM</option>
+                  <option>PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="passengers" style="margin-bottom:7px">Passengers</label>
+              <select id="passengers" name="passengers">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12+</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 3: Vehicle Selection -->
+          <div>
+            <div class="vehicle-section-title">🚘 Select your vehicle type</div>
+            <div class="vehicle-grid-v2" id="vehicle-grid"></div>
+          </div>
+
+          <!-- Row 4: Calculate & Results -->
+          <button type="button" class="btn-calc-fare" id="btn-calc-fare">
+            Get Fare Estimate
+          </button>
+          <div class="booking-results-area" id="booking-results" style="display:none;">
+            <div class="result-box" id="result-fare">
+              <div class="result-box-empty" id="fare-placeholder">Select pickup, destination & vehicle to see a fare
+                estimate</div>
+              <div id="fare-content" style="display:none;">
+                <span class="estimate-tag">Route & Estimated Fare</span>
+                <div class="preview-line"><strong>Driving distance:</strong> <span
+                    id="distance-value">Calculating...</span></div>
+                <div class="estimate-val" id="fare-value"></div>
+                <div class="estimate-sub" id="fare-desc"></div>
+              </div>
+            </div>
+            <div class="result-box" id="result-preview">
+              <div class="result-box-empty" id="preview-placeholder">Your booking summary will appear here</div>
+              <div id="preview-content" style="display:none;">
+                <span class="estimate-tag">Booking Preview</span>
+                <div class="preview-line"><strong>Passenger:</strong> <span id="preview-passenger"></span></div>
+                <div class="preview-line"><strong>Pickup:</strong> <span id="preview-pickup"></span></div>
+                <div class="preview-line"><strong>Destination:</strong> <span id="preview-dest"></span></div>
+                <div class="preview-line"><strong>Date:</strong> <span id="preview-date"></span></div>
+                <div class="preview-line"><strong>Time:</strong> <span id="preview-time"></span></div>
+                <div class="preview-line"><strong>Passengers:</strong> <span id="preview-pax"></span></div>
+                <div class="preview-line"><strong>Vehicle:</strong> <span id="preview-vehicle"></span></div>
+                <button type="button" class="btn-confirm-wa" id="btn-confirm-wa">
+                  Confirm on WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p class="booking-note">No account required. Your request will open WhatsApp so you can confirm details
+            directly.</p>
+          <div id="quick-toast" class="toast" role="status"></div>
+        </form>
+      </div>
+    </section>
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section-head">
+          <div><span class="kicker">Travel your way</span>
+            <h2>One ride, many possibilities.</h2>
+            <p>Whether you are landing in Sri Lanka or planning a full island adventure, start with the service that
+              suits your trip.</p>
+          </div>
+        </div>
+        <div class="service-grid">
+          <article class="service-card"><span class="service-icon">✈</span>
+            <h3>Airport transfers</h3>
+            <p>Arrange pickup from the airport to your hotel or any destination across the island.</p><a
+              class="text-link" href="#booking">Arrange pickup →</a>
+          </article>
+          <article class="service-card"><span class="service-icon">🚘</span>
+            <h3>Private taxi rides</h3>
+            <p>Travel between cities comfortably, with a pickup time and destination that suit you.</p><a
+              class="text-link" href="#booking">Request a ride →</a>
+          </article>
+          <article class="service-card"><span class="service-icon">🌴</span>
+            <h3>Day tours & island trips</h3>
+            <p>Plan sightseeing days, scenic routes and multi-day trips around Sri Lanka.</p><a class="text-link"
+              href="#contact">Plan a tour →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section section-soft" id="destinations">
+      <div class="container">
+        <div class="section-head">
+          <div><span class="kicker">Find your next stop</span>
+            <h2>Places worth the journey.</h2>
+            <p>Get inspired by a few of Sri Lanka's favourite places. Ask us about a route that fits your plans.</p>
+          </div><a class="btn btn-green" href="#booking">Plan a route →</a>
+        </div>
+        <div class="destination-grid"><a class="destination" href="#booking" data-destination="Sigiriya"
+            data-coords="7.9570,80.7603"><img src="images/Sigiriya Fortress Above the Jungle.png"
+              alt="Historic rock fortress landscape" loading="lazy">
+            <div class="destination-caption">
+              <h3>Sigiriya</h3>
+              <p>History & heritage</p>
+            </div>
+          </a><a class="destination" href="#booking" data-destination="Ella" data-coords="6.8667,81.0466"><img
+              src="images/Ella Tea Country Train Panorama.png" alt="Lush Sri Lankan hill country" loading="lazy">
+            <div class="destination-caption">
+              <h3>Ella</h3>
+              <p>Mountains & tea country</p>
+            </div>
+          </a><a class="destination" href="#booking" data-destination="Galle" data-coords="6.0535,80.2210"><img
+              src="images/Galle Fort at Golden Hour.png" alt="Coastal travel destination" loading="lazy">
+            <div class="destination-caption">
+              <h3>Galle</h3>
+              <p>Coast & colonial charm</p>
+            </div>
+          </a><a class="destination" href="#booking" data-destination="Kandy" data-coords="7.2906,80.6337"><img
+              src="images/Kandy Temple Reflections at Golden Hour.png" alt="Sri Lankan temple and green landscape"
+              loading="lazy">
+            <div class="destination-caption">
+              <h3>Kandy</h3>
+              <p>Culture & nature</p>
+            </div>
+          </a></div>
+      </div>
+    </section>
+    <section class="section section-soft" id="fare-guide">
+      <div class="container">
+        <div class="section-head">
+          <div><span class="kicker">Plan your travel budget</span>
+            <h2>Indicative airport transfer prices.</h2>
+            <p>These are rough starting estimates for a one-way private transfer. The final fare depends on vehicle
+              type, passenger and luggage count, pickup time, stops and the exact address. Please confirm on WhatsApp
+              before booking.</p>
+          </div><a class="btn btn-green" href="#booking">Request a quote →</a>
+        </div>
+        <div class="fare-grid" id="fare-grid"></div>
+        <p class="fare-disclaimer">Planning estimates only — not guaranteed or confirmed prices. Final
+          vehicle-specific
+          pricing will be updated when the business price list is provided.</p>
+      </div>
+    </section>
+    <section class="section" id="why-us">
+      <div class="container why-grid">
+        <div class="why-photo"><img
+            src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85"
+            alt="Warm welcoming travel and hospitality setting" loading="lazy"></div>
+        <div><span class="kicker">Simple from start to finish</span>
+          <h2>Your trip, made easier.</h2>
+          <p style="color:var(--muted)">Travel planning should feel exciting, not complicated. Tell us where you want to
+            go and we'll help you take the next step.</p>
+          <div class="benefits">
+            <div class="benefit"><span class="round-icon">✓</span>
+              <div><strong>Easy to arrange</strong>
+                <p>Send your trip details in a few steps.</p>
+              </div>
+            </div>
+            <div class="benefit"><span class="round-icon">⌖</span>
+              <div><strong>Flexible journeys</strong>
+                <p>Airport rides, city transfers and custom routes.</p>
+              </div>
+            </div>
+            <div class="benefit"><span class="round-icon">♡</span>
+              <div><strong>Personal support</strong>
+                <p>Discuss your plans before confirming.</p>
+              </div>
+            </div>
+            <div class="benefit"><span class="round-icon">◷</span>
+              <div><strong>Your schedule</strong>
+                <p>Request the date and time you prefer.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reviews-section" id="reviews">
+      <div class="container">
+        <div class="section-head">
+          <div><span class="kicker">Customer feedback</span>
+            <h2>Share your LankaRide experience.</h2>
+            <p>Had a trip with us? Your honest feedback helps us improve and helps other travellers plan with
+              confidence.</p>
+          </div>
+        </div>
+        <div class="reviews-summary">
+          <div class="reviews-score"><strong>Guest reviews</strong>
+            <p>We publish feedback only after it has been received and checked.</p>
+          </div>
+          <a class="btn btn-green" href="#leave-review">Write a review ↓</a>
+        </div>
+        <div class="review-empty">
+          <h3>Your experience could help the next traveller.</h3>
+          <p>We're building our customer review collection. If you've travelled with LankaRide, please share your
+            genuine feedback below. No sample or made-up reviews are displayed here.</p>
+        </div>
+        <div class="review-form-card" id="leave-review">
+          <h3>Leave a review</h3>
+          <p>Complete this short form. WhatsApp will open with your review ready to send to LankaRide.</p>
+          <form id="customer-review-form" class="review-fields">
+            <div class="field"><label for="review-name">Your name</label><input id="review-name" name="name"
+                autocomplete="name" placeholder="Name or display name" required maxlength="80"></div>
+            <div class="field"><label for="review-country">Country</label><input id="review-country" name="country"
+                autocomplete="country-name" placeholder="e.g. Germany" maxlength="80"></div>
+            <div class="field"><label for="review-trip">Trip type</label><select id="review-trip" name="trip" required>
+                <option value="" selected disabled>Select your trip</option>
+                <option>Airport transfer</option>
+                <option>City-to-city ride</option>
+                <option>Day tour</option>
+                <option>Multi-day tour</option>
+                <option>Other</option>
+              </select></div>
+            <div class="field"><label for="review-rating">Rating</label><select id="review-rating" name="rating"
+                required>
+                <option value="5" selected>5 — Excellent</option>
+                <option value="4">4 — Very good</option>
+                <option value="3">3 — Good</option>
+                <option value="2">2 — Needs improvement</option>
+                <option value="1">1 — Poor</option>
+              </select></div>
+            <div class="field wide"><label for="review-text">Your review</label><textarea id="review-text" name="review"
+                placeholder="Tell us about your ride, driver, comfort or overall experience…" required minlength="10"
+                maxlength="1200"></textarea></div>
+            <div class="wide"><button class="btn btn-green" type="submit">Send review via WhatsApp →</button>
+              <p class="review-privacy">Your review is sent to LankaRide via WhatsApp. It will not appear publicly on
+                this website automatically; we may contact you before publishing it.</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="container" style="padding-bottom:78px">
+      <div class="cta">
+        <div>
+          <h2>Ready to explore Sri Lanka?</h2>
+          <p>Tell us your pickup, destination and travel date. We'll help you arrange your next ride.</p>
+        </div><a class="btn btn-primary" href="#booking">Start a booking →</a>
+      </div>
+    </section>
+  </main>
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <div><a class="brand" href="#home"><span class="brand-mark">↗</span><span>LankaRide</span></a>
+          <p>Simple private transport for discovering Sri Lanka. Contact us to request your ride and confirm the final
+            fare.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <div class="footer-links"><a href="#services">Our services</a><a href="#destinations">Destinations</a><a
+              href="#booking">Book a taxi</a></div>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <div class="footer-links"><a href="#booking">Request a booking</a><a href="https://wa.me/94760900262"
+              target="_blank" rel="noopener">WhatsApp: +94 76 090 0262</a><span>Indicative prices available on selected
+              airport routes</span></div>
+        </div>
+      </div>
+      <div class="copyright">Â© <span id="year"></span> LankaRide. Preliminary website. Route estimates are indicative
+        only; confirm your final fare before booking.</div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="booking-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-top">
+        <h2 id="modal-title">Request your ride</h2><button class="close" id="close-modal" aria-label="Close">×</button>
+      </div>
+      <p style="color:var(--muted);margin-top:6px">Add a few details so the driver can respond to your request.</p>
+      <form id="full-booking">
+        <div class="fields">
+          <div class="field">
+            <div class="field-header"><label for="modal-pickup">Pickup location</label>
+              <div class="field-tools"><button type="button" class="tool-btn" id="btn-modal-live-pickup"
+                  title="Use current GPS live location">📍 Live</button><button type="button" class="tool-btn"
+                  id="btn-modal-map-pickup" title="Pick pickup on map">🗺️ Map</button></div>
+            </div><input id="modal-pickup" required>
+          </div>
+          <div class="field">
+            <div class="field-header"><label for="modal-destination">Destination</label>
+              <div class="field-tools"><button type="button" class="tool-btn" id="btn-modal-map-destination"
+                  title="Pick destination on map">🗺️ Map</button></div>
+            </div><input id="modal-destination" required>
+          </div>
+          <div class="field"><label for="modal-date" style="margin-bottom:7px">Travel date</label><input id="modal-date"
+              type="date" required></div>
+          <div class="field"><label for="modal-time" style="margin-bottom:7px">Pickup time</label><input id="modal-time"
+              type="time" required></div>
+          <div class="field"><label for="modal-passengers" style="margin-bottom:7px">Passengers</label><select
+              id="modal-passengers">
+              <option>1</option>
+              <option selected>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7+</option>
+            </select></div>
+          <div class="field"><label for="vehicle" style="margin-bottom:7px">Vehicle preference</label><select
+              id="vehicle">
+              <option value="">Recommend a vehicle</option>
+            </select></div>
+          <div class="field wide"><label for="name" style="margin-bottom:7px">Your name</label><input id="name"
+              placeholder="Full name" required></div>
+          <div class="field wide"><label for="contact-detail" style="margin-bottom:7px">Email or WhatsApp
+              number</label><input id="contact-detail" placeholder="How can we contact you?" required></div>
+          <div class="field wide"><label for="notes" style="margin-bottom:7px">Extra details (optional)</label><textarea
+              id="notes" rows="3" placeholder="Flight number, luggage, stops or other requests"></textarea></div><button
+            class="btn btn-green wide" type="submit">Continue to WhatsApp →</button>
+        </div>
+        <div id="modal-toast" class="toast" role="status"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Leaflet Map Selection Modal -->
+  <div class="modal-backdrop" id="map-modal" role="dialog" aria-modal="true" aria-labelledby="map-modal-title">
+    <div class="map-modal-wrap">
+      <div class="modal-top">
+        <div>
+          <h2 id="map-modal-title" style="font-size:1.3rem;margin:0">Select Location on Map</h2>
+          <p id="map-modal-hint" style="color:var(--muted);margin:3px 0 0;font-size:0.85rem">Click anywhere on the map
+            or drag the pin to set your point.</p>
+        </div>
+        <button class="close" id="close-map-modal" aria-label="Close map">×</button>
+      </div>
+      <div class="map-search-row">
+        <input type="text" id="map-search-input"
+          placeholder="Search city, beach, or landmark (e.g. Mirissa, Sigiriya)..." autocomplete="off">
+        <button type="button" class="btn btn-green" id="btn-map-search"
+          style="padding:9px 15px;font-size:0.88rem">Search</button>
+        <button type="button" class="tool-btn" id="btn-map-my-location" style="padding:9px 12px;font-size:0.86rem">📍
+          My
+          Location</button>
+      </div>
+      <div id="interactive-map"></div>
+      <div class="map-footer-preview">
+        <div class="map-footer-text">
+          <strong id="map-selected-address">Click on the map or search to place a pin</strong>
+          <small id="map-selected-coords">Zoom in for higher precision across Sri Lanka</small>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-confirm-map-location" disabled
+          style="padding:10px 18px;font-size:0.9rem">Select Location</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    // Business settings are kept in config.js so they can be updated without editing this page.
+    const SITE_CONFIG = window.LANKARIDE_CONFIG || {};
+    const WHATSAPP_NUMBER = SITE_CONFIG.whatsappNumber || "REPLACE_WITH_BUSINESS_WHATSAPP_NUMBER";
+    const ROUTE_FARES = SITE_CONFIG.routeFares || {};
+    const ESTIMATED_ROUTES = SITE_CONFIG.estimatedRoutes || [];
+    const VEHICLES = SITE_CONFIG.vehicles || [];
+    const $ = (id) => document.getElementById(id);
+    $('year').textContent = new Date().getFullYear();
+    const today = new Date(); const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    ['date', 'modal-date'].forEach(id => { $(id).min = localToday; });
+    function showToast(el, msg) { el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 5000); }
+    function findRouteFare(pickup, destination) {
+      const key = `${String(pickup).trim().toLowerCase()}|${String(destination).trim().toLowerCase()}`;
+      for (const [route, fare] of Object.entries(ROUTE_FARES)) {
+        if (route.trim().toLowerCase() === key && Number.isFinite(Number(fare))) return Number(fare);
+      }
+      return null;
+    }
+    function normalizePlace(value) { return String(value || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+    function findEstimatedRoute(pickup, destination) {
+      const p = normalizePlace(pickup), d = normalizePlace(destination);
+      return ESTIMATED_ROUTES.find(route => route.pickupAliases.some(alias => p.includes(normalizePlace(alias))) && route.destinationAliases.some(alias => d.includes(normalizePlace(alias)))) || null;
+    }
+    function money(value) { return `${SITE_CONFIG.currency || 'LKR'} ${Number(value).toLocaleString('en-LK')}`; }
+
+    /* ============================================================
+     * VEHICLE SELECTION CARDS
+     * ============================================================ */
+    let selectedVehicleId = null;
+    let lastRouteEstimate = null;
+
+    function renderVehicleCards() {
+      const grid = $('vehicle-grid');
+      if (!grid || !VEHICLES.length) return;
+      grid.innerHTML = VEHICLES.map(v => `
+        <div class="vehicle-card-v2" data-vehicle-id="${v.id}" tabindex="0" role="radio" aria-checked="false" aria-label="${v.name}">
+          <div class="vehicle-img-wrap">
+            <img src="${v.image}" alt="${v.name}" loading="lazy" onerror="this.style.display='none'">
+          </div>
+          <div class="vehicle-info-v2">
+            <strong>${v.name}</strong>
+            <span class="vehicle-model">${v.model}</span>
+            <span class="vehicle-model" style="font-weight:800;color:var(--green2)">LKR ${Number(v.ratePerKm).toLocaleString('en-LK')}/km</span>
+            <div class="vehicle-badges">
+              <span class="v-badge">👤 ${v.passengers}</span>
+              <span class="v-badge">🧳 ${v.luggage}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      grid.querySelectorAll('.vehicle-card-v2').forEach(card => {
+        card.addEventListener('click', () => selectVehicle(card.dataset.vehicleId));
+        card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectVehicle(card.dataset.vehicleId); } });
+      });
+
+      // Auto-select best vehicle based on passenger count
+      autoSelectVehicle();
+    }
+
+    function selectVehicle(vehicleId) {
+      selectedVehicleId = vehicleId;
+      lastRouteEstimate = null;
+      document.querySelectorAll('.vehicle-card-v2').forEach(c => {
+        const isSelected = c.dataset.vehicleId === vehicleId;
+        c.classList.toggle('selected', isSelected);
+        c.setAttribute('aria-checked', isSelected);
+      });
+    }
+
+    function autoSelectVehicle() {
+      const pax = parseInt($('passengers').value) || 2;
+      // Find the smallest vehicle that can fit this many passengers
+      const suitable = VEHICLES.filter(v => v.maxPassengers >= pax).sort((a, b) => a.maxPassengers - b.maxPassengers);
+      if (suitable.length) {
+        selectVehicle(suitable[0].id);
+      } else if (VEHICLES.length) {
+        // If no vehicle fits, select the largest one
+        selectVehicle(VEHICLES[VEHICLES.length - 1].id);
+      }
+    }
+
+    // Auto-select vehicle when passenger count changes
+    $('passengers').addEventListener('change', autoSelectVehicle);
+
+    renderVehicleCards();
+
+    /* ============================================================
+     * MODAL VEHICLE DROPDOWN POPULATION
+     * ============================================================ */
+    function populateModalVehicleDropdown() {
+      const sel = $('vehicle');
+      if (!sel || !VEHICLES.length) return;
+      VEHICLES.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = `${v.name} (${v.passengers}, ${v.luggage})`;
+        sel.appendChild(opt);
+      });
+    }
+    populateModalVehicleDropdown();
+
+    /* ============================================================
+     * AIRPORT QUICK-FILL BUTTON
+     * ============================================================ */
+    $('btn-airport-pickup').addEventListener('click', () => {
+      $('pickup').value = 'Bandaranaike International Airport';
+      $('pickup').dataset.coords = '7.180800,79.884100';
+      $('pickup').dataset.fullLabel = 'Bandaranaike International Airport';
+      const pickupPanel = $('pickup-suggestions');
+      if (pickupPanel) { pickupPanel.classList.remove('open'); pickupPanel.innerHTML = ''; }
+      showToast($('quick-toast'), '✈ Pickup set to Bandaranaike International Airport');
+    });
+
+    /* ============================================================
+     * FARE CALCULATION & PREVIEW
+     * ============================================================ */
+    function getPickupTime() {
+      const h = $('pickup-hour').value, m = $('pickup-minute').value, ap = $('pickup-ampm').value;
+      if (!h || !m) return '';
+      return `${h}:${m} ${ap}`;
+    }
+
+    /*
+     * Location autocomplete using OpenStreetMap Nominatim.
+     * Suggestions appear after 3 characters; selecting one stores its coordinates
+     * so route calculation uses the chosen place rather than geocoding it again.
+     */
+    function setupLocationAutocomplete(inputId, suggestionsId) {
+      const input = $(inputId);
+      const panel = $(suggestionsId);
+      if (!input || !panel) return;
+
+      let debounceTimer;
+      let requestController;
+
+      function closeSuggestions() {
+        panel.classList.remove('open');
+        panel.innerHTML = '';
+      }
+
+      function showMessage(message) {
+        panel.innerHTML = '';
+        const row = document.createElement('div');
+        row.className = 'location-suggestion';
+        row.textContent = message;
+        panel.appendChild(row);
+        panel.classList.add('open');
+      }
+
+      input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        if (requestController) requestController.abort();
+        delete input.dataset.coords;
+
+        const query = input.value.trim();
+        if (query.length < 3) {
+          closeSuggestions();
+          return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+          requestController = new AbortController();
+          showMessage('Searching places…');
+
+          try {
+            const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=lk&q=${encodeURIComponent(query)}`;
+            const response = await fetch(url, {
+              headers: { 'Accept': 'application/json' },
+              signal: requestController.signal
+            });
+            if (!response.ok) throw new Error('Search unavailable');
+            const places = await response.json();
+
+            if (input.value.trim() !== query) return;
+            panel.innerHTML = '';
+
+            if (!places.length) {
+              showMessage('No places found. Try a nearby town or landmark.');
+              return;
+            }
+
+            places.forEach(place => {
+              const option = document.createElement('button');
+              option.type = 'button';
+              option.className = 'location-suggestion';
+              option.setAttribute('role', 'option');
+
+              const fullName = place.display_name || query;
+              const mainName = fullName.split(',')[0];
+              const title = document.createElement('span');
+              title.textContent = mainName;
+              const detail = document.createElement('small');
+              detail.textContent = fullName;
+              option.append(title, detail);
+
+              option.addEventListener('mousedown', event => event.preventDefault());
+              option.addEventListener('click', () => {
+                input.value = mainName;
+                input.dataset.coords = `${place.lat},${place.lon}`;
+                input.dataset.fullLabel = fullName;
+                closeSuggestions();
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+              });
+              panel.appendChild(option);
+            });
+            panel.classList.add('open');
+          } catch (error) {
+            if (error.name !== 'AbortError') {
+              showMessage('Suggestions could not load. You can still enter the location manually.');
+            }
+          }
+        }, 450);
+      });
+
+      input.addEventListener('focus', () => {
+        if (panel.children.length && input.value.trim().length >= 3) {
+          panel.classList.add('open');
+        }
+      });
+
+      document.addEventListener('click', event => {
+        if (!input.parentElement.contains(event.target)) closeSuggestions();
+      });
+
+      input.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeSuggestions();
+      });
+    }
+
+    setupLocationAutocomplete('pickup', 'pickup-suggestions');
+    setupLocationAutocomplete('destination-input', 'destination-suggestions');
+
+    async function geocodeLocation(name, inputEl) {
+      if (inputEl && inputEl.dataset.coords) {
+        const [lat, lng] = inputEl.dataset.coords.split(',').map(Number);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng, label: name };
+      }
+      const query = `${name}, Sri Lanka`;
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=lk&q=${encodeURIComponent(query)}`;
+      const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!response.ok) throw new Error('Location lookup is temporarily unavailable.');
+      const results = await response.json();
+      if (!results.length) throw new Error(`Could not find "${name}". Try a more specific place name or select it on the map.`);
+      return { lat: Number(results[0].lat), lng: Number(results[0].lon), label: results[0].display_name };
+    }
+
+    async function getDrivingRoute(pickup, destination) {
+      const [from, to] = await Promise.all([
+        geocodeLocation(pickup, $('pickup')),
+        geocodeLocation(destination, $('destination-input'))
+      ]);
+      const routeUrl = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=false&steps=false`;
+      const response = await fetch(routeUrl);
+      if (!response.ok) throw new Error('Driving route service is temporarily unavailable. Please try again.');
+      const data = await response.json();
+      if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
+        throw new Error('A driving route could not be found for these locations. Please choose nearby landmarks or contact us on WhatsApp.');
+      }
+      return { km: data.routes[0].distance / 1000, minutes: data.routes[0].duration / 60, from, to };
+    }
+
+    async function calculateFare() {
+      const passengerName = $('passenger-name').value.trim();
+      const pickupVal = $('pickup').value.trim();
+      const destVal = $('destination-input').value.trim();
+      const dateVal = $('date').value;
+      const timeVal = getPickupTime();
+      const paxVal = $('passengers').value;
+
+      if (!passengerName) { showToast($('quick-toast'), 'Please enter the passenger name'); $('passenger-name').focus(); return; }
+      if (!pickupVal) { showToast($('quick-toast'), 'Please enter a pickup location'); return; }
+      if (!destVal) { showToast($('quick-toast'), 'Please enter a destination'); return; }
+      if (!dateVal) { showToast($('quick-toast'), 'Please select a travel date'); return; }
+      if (!selectedVehicleId) { showToast($('quick-toast'), 'Please select a vehicle type'); return; }
+
+      const vehicle = VEHICLES.find(v => v.id === selectedVehicleId);
+      if (!vehicle) return;
+      const pax = parseInt(paxVal) || 2;
+      if (pax > vehicle.maxPassengers) {
+        showToast($('quick-toast'), `${vehicle.name} supports max ${vehicle.maxPassengers} passengers. Please select a larger vehicle.`);
+        return;
+      }
+      if (normalizePlace(pickupVal) === normalizePlace(destVal)) {
+        showToast($('quick-toast'), 'Pickup and destination must be different locations.');
+        return;
+      }
+
+      const btn = $('btn-calc-fare');
+      const oldButtonText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> Calculating driving distance...';
+      $('booking-results').style.display = 'grid';
+      $('result-fare').classList.add('active');
+      $('result-preview').classList.add('active');
+      $('fare-placeholder').style.display = 'none';
+      $('fare-content').style.display = 'block';
+      $('distance-value').textContent = 'Calculating...';
+      $('fare-value').textContent = '—';
+      $('fare-desc').textContent = 'Getting the driving route distance from the map service.';
+
+      try {
+        const route = await getDrivingRoute(pickupVal, destVal);
+        const km = route.km;
+        const rate = Number(vehicle.ratePerKm);
+        if (!Number.isFinite(rate) || rate <= 0) throw new Error('The selected vehicle rate is not configured.');
+
+        // Charge based on routed driving distance (not straight-line distance).
+        const total = Math.round(km * rate);
+        lastRouteEstimate = { pickup: pickupVal, destination: destVal, km, rate, total, vehicleName: vehicle.name, date: dateVal, time: timeVal, passengers: paxVal };
+        $('distance-value').textContent = `${km.toFixed(1)} km`;
+        $('fare-value').textContent = money(total);
+        $('fare-desc').textContent = `${money(rate)} per km × ${km.toFixed(1)} km. Rough estimate; final fare must be confirmed by the driver.`;
+
+        $('preview-passenger').textContent = passengerName;
+        $('preview-passenger').textContent = passengerName;
+        $('preview-pickup').textContent = pickupVal;
+        $('preview-dest').textContent = destVal;
+        $('preview-date').textContent = dateVal;
+        $('preview-time').textContent = timeVal || 'Not specified';
+        $('preview-pax').textContent = paxVal;
+        $('preview-vehicle').textContent = `${vehicle.name} (${vehicle.model}) · ${money(rate)}/km`;
+        $('preview-placeholder').style.display = 'none';
+        $('preview-content').style.display = 'block';
+        $('booking-results').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (error) {
+        lastRouteEstimate = null;
+        $('distance-value').textContent = 'Unavailable';
+        $('fare-value').textContent = 'Request a quote';
+        $('fare-desc').textContent = error.message || 'Could not calculate this route. Please request a quote on WhatsApp.';
+        $('preview-pickup').textContent = pickupVal;
+        $('preview-dest').textContent = destVal;
+        $('preview-date').textContent = dateVal;
+        $('preview-time').textContent = timeVal || 'Not specified';
+        $('preview-pax').textContent = paxVal;
+        $('preview-vehicle').textContent = `${vehicle.name} (${vehicle.model})`;
+        $('preview-placeholder').style.display = 'none';
+        $('preview-content').style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldButtonText;
+      }
+    }
+
+    $('btn-calc-fare').addEventListener('click', calculateFare);
+
+    /* ============================================================
+     * WHATSAPP MESSAGE BUILDER
+     * ============================================================ */
+    function formatLoc(label, name, coords) {
+      if (coords) return `${label}: ${name}\n  └ 📍 Map Pin: https://maps.google.com/?q=${coords}`;
+      return `${label}: ${name}`;
+    }
+
+    function fareText(pickup, destination, vehicle) {
+      if (lastRouteEstimate && lastRouteEstimate.pickup === pickup && lastRouteEstimate.destination === destination) {
+        return `Driving distance: ${lastRouteEstimate.km.toFixed(1)} km\nEstimated fare: ${money(lastRouteEstimate.total)} (${money(lastRouteEstimate.rate)}/km × ${lastRouteEstimate.km.toFixed(1)} km). Please confirm final fare.`;
+      }
+      return vehicle ? `Rate: ${money(vehicle.ratePerKm)}/km. Distance/fare not calculated yet; please confirm the quote on WhatsApp.` : 'Fare: Please confirm the fare on WhatsApp.';
+    }
+
+    function sendWhatsApp(message, toast) {
+      if (!WHATSAPP_NUMBER || WHATSAPP_NUMBER.startsWith('REPLACE')) { showToast(toast, 'WhatsApp booking is not configured. Please contact the website owner.'); return; }
+      window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+    }
+
+    // Main booking confirm button
+    $('btn-confirm-wa').addEventListener('click', () => {
+      const pickupVal = $('pickup').value.trim();
+      const destVal = $('destination-input').value.trim();
+      const pCoords = $('pickup').dataset.coords;
+      const dCoords = $('destination-input').dataset.coords;
+      const vehicle = VEHICLES.find(v => v.id === selectedVehicleId);
+
+      const msg = [
+        `Hello! I would like to request a taxi booking.`,
+        ``,
+        `👤 Passenger name: ${$('passenger-name').value.trim() || 'Not provided'}`,
+        formatLoc('📍 Pickup', pickupVal, pCoords),
+        formatLoc('📌 Destination', destVal, dCoords),
+        `📅 Date: ${$('date').value}`,
+        `🕐 Time: ${getPickupTime() || 'Flexible'}`,
+        `👤 Passengers: ${$('passengers').value}`,
+        vehicle ? `🚘 Vehicle: ${vehicle.name} (${vehicle.model})` : '',
+        vehicle ? `   └ Capacity: ${vehicle.passengers} Â· Luggage: ${vehicle.luggage}` : '',
+        ``,
+        fareText(pickupVal, destVal, vehicle),
+        ``,
+        `Please confirm availability and final fare. Thank you!`
+      ].filter(Boolean).join('\n');
+
+      sendWhatsApp(msg, $('quick-toast'));
+    });
+
+    // Prevent default form submit (we use the Calculate + WhatsApp flow instead)
+    $('quick-booking').addEventListener('submit', e => {
+      e.preventDefault();
+      calculateFare();
+    });
+
+    /* ============================================================
+     * FARE CARDS SECTION
+     * ============================================================ */
+    const ROUTE_DETAILS = {
+      colombo: {
+        distance: 'Approx. 35 km',
+        duration: '45–90 min',
+        description: 'Travel from the airport towards Sri Lanka’s commercial capital, using the main road or expressway connections depending on your destination and traffic.'
+      },
+      negombo: {
+        distance: 'Approx. 10–15 km',
+        duration: '20–30 min',
+        description: 'A short transfer to Negombo’s beach hotels, lagoon and restaurants—ideal for settling in after your flight.'
+      },
+      kandy: {
+        distance: 'Approx. 110–120 km',
+        duration: '3–4 hours',
+        description: 'Head inland towards the central hills and Kandy’s lake, temples and cultural attractions.'
+      },
+      sigiriya: {
+        distance: 'Approx. 145–160 km',
+        duration: '3.5–5 hours',
+        description: 'Travel inland towards Sri Lanka’s Cultural Triangle, known for ancient heritage sites and the iconic Sigiriya Rock Fortress.'
+      },
+      galle: {
+        distance: 'Approx. 150–160 km',
+        duration: '2.5–3.5 hours',
+        description: 'Head south towards the coastal region and Southern Expressway, with access to Galle Fort and nearby beaches.'
+      },
+      ella: {
+        distance: 'Approx. 240–250 km',
+        duration: '6.5–8 hours',
+        description: 'A scenic journey into the hill country, with winding roads, tea plantations and mountain landscapes along the way.'
+      }
+    };
+
+    function getRouteDetails(route) {
+      const text = `${route.label || ''} ${route.destinationAliases?.join(' ') || ''}`.toLowerCase();
+      const destination = Object.keys(ROUTE_DETAILS).find(place => text.includes(place));
+      return destination ? ROUTE_DETAILS[destination] : {
+        distance: 'Distance varies by exact address',
+        duration: 'Travel time varies',
+        description: 'The route and journey duration depend on your exact pickup point, destination and road conditions.'
+      };
+    }
+
+    function renderFareCards() {
+      const grid = $('fare-grid'); if (!grid) return;
+      grid.innerHTML = ESTIMATED_ROUTES.map((route, i) => {
+        const details = getRouteDetails(route);
+        return `<article class="fare-card">
+          <div class="route">${route.label}</div>
+          <div class="estimate">${money(route.min)}–${money(route.max)}</div>
+          <div class="route-meta">
+            <span>📍 ${details.distance}</span>
+            <span>🕒 ${details.duration}</span>
+          </div>
+          <p class="route-description">${details.description}</p>
+          <small class="route-note">Estimated one-way journey · Private transfer. Actual distance and time may vary with the exact address, traffic and road conditions.</small>
+          <button type="button" data-route-index="${i}">Request this route</button>
+        </article>`;
+      }).join('');
+      grid.querySelectorAll('[data-route-index]').forEach(button => button.addEventListener('click', () => {
+        const route = ESTIMATED_ROUTES[Number(button.dataset.routeIndex)];
+        $('pickup').value = 'Bandaranaike International Airport';
+        $('pickup').dataset.coords = '7.1808,79.8841';
+        $('destination-input').value = route.destinationAliases[0].charAt(0).toUpperCase() + route.destinationAliases[0].slice(1);
+        delete $('destination-input').dataset.coords;
+        $('booking').scrollIntoView({ behavior: 'smooth' }); $('pickup').focus();
+      }));
+    }
+    renderFareCards();
+
+    /* ============================================================
+     * MODAL BOOKING
+     * ============================================================ */
+    const modal = $('booking-modal');
+    function openModal() { modal.classList.add('open'); $('modal-pickup').focus(); }
+    function closeModal() { modal.classList.remove('open'); }
+    $('close-modal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    $('full-booking').addEventListener('submit', e => {
+      e.preventDefault();
+      const pName = $('modal-pickup').value, dName = $('modal-destination').value;
+      const pCoords = $('modal-pickup').dataset.coords, dCoords = $('modal-destination').dataset.coords;
+      const vehicleSel = $('vehicle');
+      const vehicleId = vehicleSel.value;
+      const vehicle = VEHICLES.find(v => v.id === vehicleId);
+      const vehicleLabel = vehicle ? `${vehicle.name} (${vehicle.model})` : (vehicleSel.options[vehicleSel.selectedIndex].text || 'Recommend a vehicle');
+
+      const msg = [
+        `Hello! I would like to request a taxi booking.`,
+        `Name: ${$('name').value}`,
+        ``,
+        formatLoc('📍 Pickup', pName, pCoords),
+        formatLoc('📌 Destination', dName, dCoords),
+        `📅 Date: ${$('modal-date').value}`,
+        `🕐 Time: ${$('modal-time').value}`,
+        `👤 Passengers: ${$('modal-passengers').value}`,
+        `🚘 Vehicle: ${vehicleLabel}`,
+        vehicle ? `   └ Capacity: ${vehicle.passengers} Â· Luggage: ${vehicle.luggage}` : '',
+        `📧 Contact: ${$('contact-detail').value}`,
+        `📝 Extra details: ${$('notes').value || 'None'}`,
+        ``,
+        fareText(pName, dName, vehicle),
+        ``,
+        `Please confirm availability and any applicable extra charges.`
+      ].filter(Boolean).join('\n');
+      sendWhatsApp(msg, $('modal-toast'));
+    });
+
+    document.querySelectorAll('[data-destination]').forEach(a => a.addEventListener('click', () => {
+      $('destination-input').value = a.dataset.destination;
+      if (a.dataset.coords) $('destination-input').dataset.coords = a.dataset.coords;
+      else delete $('destination-input').dataset.coords;
+    }));
+
+    // Clear coords if user manually alters input text
+    ['pickup', 'destination-input', 'modal-pickup', 'modal-destination'].forEach(id => {
+      const el = $(id);
+      if (el) el.addEventListener('input', () => { delete el.dataset.coords; lastRouteEstimate = null; });
+    });
+
+    /* ============================================================
+     * GEOLOCATION & INTERACTIVE MAP MODULE
+     * ============================================================ */
+    let leafletMap = null;
+    let currentMarker = null;
+    let activeMapInput = null;
+    let activeCoordsAttr = null;
+    let currentSelectedGeo = null;
+
+    const pinIcon = L.divIcon({
+      className: 'custom-map-pin',
+      html: `<div style="background:#163d32;color:#e9bd72;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,0.35);border:2px solid #fff;"><span style="transform:rotate(45deg);font-size:16px;">🚕</span></div>`,
+      iconSize: [34, 34],
+      iconAnchor: [17, 34],
+      popupAnchor: [0, -34]
+    });
+
+    async function reverseGeocode(lat, lng) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error('Geocoding response not ok');
+        const data = await res.json();
+        if (data && data.display_name) {
+          const a = data.address || {};
+          const place = a.tourism || a.amenity || a.hotel || a.building || a.road || a.suburb || a.village || a.town || a.city || '';
+          const locality = a.city || a.town || a.county || a.state || '';
+          let shortName = place && locality && place !== locality ? `${place}, ${locality}` : (data.name || data.display_name.split(',').slice(0, 3).join(','));
+          return { shortName: shortName.trim(), fullName: data.display_name, lat, lng };
+        }
+      } catch (err) {
+        console.warn('Reverse geocoding notice:', err);
+      }
+      return { shortName: `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`, fullName: `Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}`, lat, lng };
+    }
+
+    function initMap() {
+      if (leafletMap) return;
+      // Center on Sri Lanka [7.8731, 80.7718]
+      leafletMap = L.map('interactive-map', { zoomControl: true }).setView([7.8731, 80.7718], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: 'Â© OpenStreetMap contributors'
+      }).addTo(leafletMap);
+
+      leafletMap.on('click', e => {
+        updateMapPin(e.latlng.lat, e.latlng.lng);
+      });
+    }
+
+    async function updateMapPin(lat, lng, zoom) {
+      if (zoom && leafletMap) {
+        leafletMap.setView([lat, lng], zoom);
+      }
+      if (!currentMarker) {
+        currentMarker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(leafletMap);
+        currentMarker.on('dragend', e => {
+          const p = e.target.getLatLng();
+          updateMapPin(p.lat, p.lng);
+        });
+      } else {
+        currentMarker.setLatLng([lat, lng]);
+      }
+
+      $('map-selected-address').textContent = 'Fetching address details...';
+      $('map-selected-coords').textContent = `Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      $('btn-confirm-map-location').disabled = true;
+
+      const geo = await reverseGeocode(lat, lng);
+      currentSelectedGeo = geo;
+      $('map-selected-address').textContent = geo.shortName;
+      $('map-selected-coords').textContent = geo.fullName;
+      $('btn-confirm-map-location').disabled = false;
+    }
+
+    function openMapModal(targetInput, titleText) {
+      activeMapInput = targetInput;
+      $('map-modal-title').textContent = titleText || 'Select Location on Map';
+      $('map-modal').classList.add('open');
+      initMap();
+      setTimeout(() => {
+        leafletMap.invalidateSize();
+        if (targetInput.dataset.coords) {
+          const [lat, lng] = targetInput.dataset.coords.split(',').map(Number);
+          updateMapPin(lat, lng, 13);
+        } else {
+          updateMapPin(7.1808, 79.8841, 10); // Default around Colombo airport
+        }
+      }, 220);
+    }
+
+    function closeMapModal() {
+      $('map-modal').classList.remove('open');
+    }
+    $('close-map-modal').addEventListener('click', closeMapModal);
+    $('map-modal').addEventListener('click', e => { if (e.target === $('map-modal')) closeMapModal(); });
+
+    $('btn-confirm-map-location').addEventListener('click', () => {
+      if (currentSelectedGeo && activeMapInput) {
+        activeMapInput.value = currentSelectedGeo.shortName;
+        activeMapInput.dataset.coords = `${currentSelectedGeo.lat.toFixed(6)},${currentSelectedGeo.lng.toFixed(6)}`;
+      }
+      closeMapModal();
+    });
+
+    // Search location in map
+    async function searchMapLocation() {
+      const query = $('map-search-input').value.trim();
+      if (!query) return;
+      const searchBtn = $('btn-map-search');
+      searchBtn.textContent = '...';
+      searchBtn.disabled = true;
+      $('map-selected-address').textContent = `Searching for "${query}"...`;
+      try {
+        let url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=lk&limit=5&q=${encodeURIComponent(query)}`;
+        let res = await fetch(url);
+        let results = await res.json();
+        if (!results || results.length === 0) {
+          url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(query)}`;
+          res = await fetch(url);
+          results = await res.json();
+        }
+        if (results && results.length > 0) {
+          const first = results[0];
+          const lat = parseFloat(first.lat), lng = parseFloat(first.lon);
+          updateMapPin(lat, lng, 14);
+        } else {
+          alert(`Location "${query}" was not found. Try searching for a nearby town, beach or landmark in Sri Lanka.`);
+          $('map-selected-address').textContent = 'Location not found';
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Search error. Please click directly on the map to place your pin.');
+      } finally {
+        searchBtn.textContent = 'Search';
+        searchBtn.disabled = false;
+      }
+    }
+
+    $('btn-map-search').addEventListener('click', searchMapLocation);
+    $('map-search-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); searchMapLocation(); } });
+
+    // Center to live location inside map
+    $('btn-map-my-location').addEventListener('click', () => {
+      if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
+      const btn = $('btn-map-my-location');
+      btn.textContent = 'Locating...';
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          btn.textContent = '📍 My Location';
+          updateMapPin(pos.coords.latitude, pos.coords.longitude, 15);
+        },
+        err => {
+          btn.textContent = '📍 My Location';
+          alert('Could not detect your current location. Please verify browser location permissions.');
+        },
+        { enableHighAccuracy: true, timeout: 9000 }
+      );
+    });
+
+    // Direct Live Location 1-Click for Inputs
+    function triggerDirectLiveLocation(targetInput, triggerBtn, toastEl) {
+      if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
+      const origBtnText = triggerBtn.textContent;
+      triggerBtn.textContent = '⏳ Locating...';
+      triggerBtn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        async pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const geo = await reverseGeocode(lat, lng);
+          targetInput.value = geo.shortName;
+          targetInput.dataset.coords = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+          triggerBtn.textContent = origBtnText;
+          triggerBtn.disabled = false;
+          if (toastEl) {
+            showToast(toastEl, `📍 Live location detected: ${geo.shortName}`);
+          }
+        },
+        err => {
+          triggerBtn.textContent = origBtnText;
+          triggerBtn.disabled = false;
+          let msg = 'Could not access your location. Please check browser permissions or use the 🗺️ Map button.';
+          if (err.code === 1) msg = 'Location permission was denied. You can still pick your location using the 🗺️ Map button.';
+          alert(msg);
+        },
+        { enableHighAccuracy: true, timeout: 9000 }
+      );
+    }
+
+    // Bind live location buttons
+    $('btn-live-pickup').addEventListener('click', () => triggerDirectLiveLocation($('pickup'), $('btn-live-pickup'), $('quick-toast')));
+    $('btn-modal-live-pickup').addEventListener('click', () => triggerDirectLiveLocation($('modal-pickup'), $('btn-modal-live-pickup'), $('modal-toast')));
+
+    // Bind map picker buttons
+    $('btn-map-pickup').addEventListener('click', () => openMapModal($('pickup'), 'Select Pickup Location'));
+    $('btn-map-destination').addEventListener('click', () => openMapModal($('destination-input'), 'Select Destination'));
+    $('btn-modal-map-pickup').addEventListener('click', () => openMapModal($('modal-pickup'), 'Select Pickup Location'));
+    $('btn-modal-map-destination').addEventListener('click', () => openMapModal($('modal-destination'), 'Select Destination'));
+
+    // ESC key closes both modals
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeMapModal();
+      }
+    });
+
+    const reviewForm = $('customer-review-form');
+    if (reviewForm) reviewForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const name = $('review-name').value.trim();
+      const country = $('review-country').value.trim() || 'Not provided';
+      const trip = $('review-trip').value;
+      const rating = $('review-rating').value;
+      const review = $('review-text').value.trim();
+      if (!name || !trip || review.length < 10) return;
+      const message = `LankaRide Customer Review\n\nName: ${name}\nCountry: ${country}\nTrip type: ${trip}\nRating: ${rating}/5\n\nReview:\n${review}\n\nPlease confirm receipt of my feedback.`;
+      window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+    });
+  </script>
+</body>
+
+</html>
