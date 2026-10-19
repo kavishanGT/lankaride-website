@@ -4,8 +4,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Book private taxis, airport transfers and tours across Sri Lanka with LankaRide.">
-  <title>LankaRide — Explore Sri Lanka</title>
+  <meta name="description"
+    content="Explore Sri Lanka with LKRide. Plan private taxi rides, airport transfers and scenic journeys with route, distance and estimated fare details. Contact us to arrange your trip.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#163d32">
+  <link rel="canonical" href="https://lkride.com/">
+
+  <title>LKRide | Sri Lanka Taxi &amp; Airport Transfers</title>
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LKRide">
+  <meta property="og:title" content="LKRide | Explore Sri Lanka With Us">
+  <meta property="og:description"
+    content="Plan your Sri Lankan journey with LKRide. Explore destinations, compare estimated fares and arrange private rides or airport transfers.">
+  <meta property="og:url" content="https://lkride.com/">
+  <meta property="og:image" content="https://lkride.com/images/image.jpg">
+  <meta property="og:image:alt" content="Scenic Sri Lankan journey with LKRide">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LKRide | Explore Sri Lanka With Us">
+  <meta name="twitter:description"
+    content="Plan private taxi rides, airport transfers and scenic journeys across Sri Lanka with LKRide.">
+  <meta name="twitter:image" content="https://lkride.com/images/image.jpg">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -1683,7 +1703,7 @@
     <nav class="nav-links" aria-label="Main navigation">
       <a href="#services">Services</a>
       <a href="#destinations">Destinations</a>
-      <a href="#why-us">Why LankaRide</a>
+      <a href="#why-us">Why LKRide</a>
       <a href="#reviews">Reviews</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -2038,7 +2058,7 @@
                 placeholder="Tell us about your ride, driver, comfort or overall experience…" required minlength="10"
                 maxlength="1200"></textarea></div>
             <div class="wide"><button class="btn btn-green" type="submit">Send review via WhatsApp →</button>
-              <p class="review-privacy">Your review is sent to LankaRide via WhatsApp. It will not appear publicly on
+              <p class="review-privacy">Your review is sent to LKRide via WhatsApp. It will not appear publicly on
                 this website automatically; we may contact you before publishing it.</p>
             </div>
           </form>
@@ -2909,7 +2929,7 @@
       const rating = $('review-rating').value;
       const review = $('review-text').value.trim();
       if (!name || !trip || review.length < 10) return;
-      const message = `LankaRide Customer Review\n\nName: ${name}\nCountry: ${country}\nTrip type: ${trip}\nRating: ${rating}/5\n\nReview:\n${review}\n\nPlease confirm receipt of my feedback.`;
+      const message = `LKRide Customer Review\n\nName: ${name}\nCountry: ${country}\nTrip type: ${trip}\nRating: ${rating}/5\n\nReview:\n${review}\n\nPlease confirm receipt of my feedback.`;
       window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
     });
   </script>
